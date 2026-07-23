@@ -21,21 +21,24 @@
 
 {% if q %}
   <p class="result-count">{{ people|length }} resultado{{ 's' if people|length != 1 }} para "{{ q }}"</p>
+  <ul class="people-list">
+    {% for p in people %}
+      <li>
+        <a class="person-row" href="{{ url_for('person', slug=p.slug) }}">
+          <span class="avatar">{{ p.display_name[0]|upper }}</span>
+          <span class="person-name">{{ p.display_name }}</span>
+          <span class="chevron">›</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="empty">Nenhum nome encontrado. Tente outra busca.</li>
+    {% endfor %}
+  </ul>
 {% else %}
-  <p class="result-count">{{ total }} pessoas na escala</p>
+  <div class="home-logo">
+    <img src="{{ url_for('static', filename='img/alvorada.png') }}"
+         alt="IPB do Jardim Alvorada"
+         onerror="this.style.display='none'">
+  </div>
 {% endif %}
-
-<ul class="people-list">
-  {% for p in people %}
-    <li>
-      <a class="person-row" href="{{ url_for('person', slug=p.slug) }}">
-        <span class="avatar">{{ p.display_name[0]|upper }}</span>
-        <span class="person-name">{{ p.display_name }}</span>
-        <span class="chevron">›</span>
-      </a>
-    </li>
-  {% else %}
-    <li class="empty">Nenhum nome encontrado. Tente outra busca.</li>
-  {% endfor %}
-</ul>
 {% endblock %}

@@ -33,8 +33,71 @@ python3 -m venv .venv
 
 ## Deploy no Railway
 
-O `Procfile` já sobe com gunicorn (`web: gunicorn app:app`). No Railway basta
-apontar para o repositório; a porta vem da variável de ambiente `PORT`.
+O `Procfile` já sobe com gunicorn (`web: gunicorn app:app --bind 0.0.0.0:$PORT`).
+No Railway basta apontar para o repositório; a porta vem da variável `PORT`.
+
+### Variáveis de ambiente
+
+| Variável | Para quê | Obrigatória |
+|---|---|---|
+| `VAPID_PRIVATE_KEY` | Chave privada do Web Push. Gere com `python gen_vapid.py`. | Sim (para push) |
+| `VAPID_CLAIM_EMAIL` | E-mail de contato do remetente, ex.: `mailto:voce@igreja.com`. | Recomendada |
+| `REMINDER_TOKEN` | Senha que protege o endpoint `/tasks/send-reminders`. | Sim (para lembretes) |
+| `DB_PATH` | Caminho do SQLite das inscrições. Aponte para um volume persistente. | Recomendada |
+| `REMINDER_DAYS` | Reservado para ajustes futuros. Padrão `1`. | Não |
+
+> **Persistência no Railway:** o disco padrão é efêmero (some a cada deploy).
+> Crie um **Volume** (ex.: montado em `/data`) e defina `DB_PATH=/data/push.db`
+> para não perder as inscrições de notificação a cada atualização.
+
+## Notificações (Web Push / PWA)
+
+O app é um PWA instalável ("adicionar à tela de início"). Cada pessoa abre a
+própria página e toca em **Ativar** para receber notificações naquele aparelho.
+
+- No **Android** funciona direto no Chrome.
+- No **iPhone** só funciona depois de **adicionar à tela de início** (exigência
+  da Apple); então abrir pelo ícone e ativar.
+
+### Lembrete do fim de semana
+
+`send_reminders.py` / o endpoint `/tasks/send-reminders` avisam **quem está na
+escala do próximo fim de semana**, dizendo o ministério (Ichthus no sábado,
+Doulos no domingo, ou ambos) e a(s) função(ões). A ideia é rodar **segunda de
+manhã**.
+
+Formas de acionar (escolha uma):
+
+```bash
+# 1) Railway Cron Service apontando para:
+python send_reminders.py
+
+# 2) Cron externo (ex.: cron-job.org) fazendo GET em:
+#    https://SEU-APP/tasks/send-reminders?token=SEU_REMINDER_TOKEN
+```
+
+Para testar com uma data específica (finge que "hoje" é essa segunda):
+
+```bash
+python send_reminders.py 2026-08-03
+```
+
+## Cores
+
+A paleta é tirada das próprias logos: fundo **vinho/bordô** (fundo do Ichthus),
+com acentos **laranja** e **dourado**; sábado (Ichthus) usa laranja e domingo
+(Doulos) usa vermelho. As variáveis ficam no topo de `static/style.css`.
+
+## Logos
+
+Coloque as imagens em `static/img/`:
+
+- `static/img/alvorada.png` — logo da igreja. Aparece na home automaticamente
+  quando o arquivo existir; enquanto não existir, o espaço fica vazio (sem erro).
+
+Os ícones do PWA ficam em `static/icons/` (atualmente placeholders na paleta
+vinho/laranja). Para usar a logo da Alvorada como ícone do app, gere as versões
+192, 512 e maskable-512 a partir dela e substitua os arquivos.
 
 ## Atualizar a escala
 
@@ -51,5 +114,6 @@ no mapa `NAME_ALIASES` em `data_loader.py`.
 
 ## Próximos passos
 
-- Notificações no celular via Web Push (PWA + Service Worker)
+- Trocar os placeholders pelas logos reais (Alvorada, Ichthus, Doulos)
+- Definir e agendar o gatilho do lembrete (segunda de manhã)
 - Login por pessoa

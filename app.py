@@ -2,11 +2,22 @@ import os
 from datetime import date
 from itertools import groupby
 
-from flask import Flask, abort, render_template, request
+from flask import (
+    Flask,
+    abort,
+    jsonify,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
 
+from config import get_settings
 from data_loader import SCHEDULES, get_data, normalize_key
+from db import count_for, delete_by_endpoint, init_db, save_subscription
 
 app = Flask(__name__)
+init_db()
 
 WEEKDAYS_PT = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"]
 MONTHS_PT = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
@@ -96,6 +107,108 @@ def service(schedule_key, iso_date):
         grouped=grouped,
         schedule=SCHEDULES[schedule_key],
     )
+
+
+# ---------------------------------------------------------------------------
+# PWA + Web Push
+# ---------------------------------------------------------------------------
+
+@app.route("/manifest.webmanifest")
+def manifest():
+    icons_dir = "icons"
+    return jsonify({
+        "name": "Escala de Louvor",
+        "short_name": "Escala",
+        "description": "Consulta da escala do ministério de louvor",
+        "start_url": "/",
+        "scope": "/",
+        "display": "standalone",
+        "background_color": "#1a1210",
+        "theme_color": "#1a1210",
+        "lang": "pt-BR",
+        "icons": [
+            {"src": url_for("static", filename=f"{icons_dir}/icon-192.png"),
+             "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": url_for("static", filename=f"{icons_dir}/icon-512.png"),
+             "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": url_for("static", filename=f"{icons_dir}/icon-maskable-512.png"),
+             "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+    })
+
+
+@app.route("/sw.js")
+def service_worker():
+    resp = send_from_directory(app.static_folder, "sw.js")
+    resp.headers["Content-Type"] = "application/javascript"
+    resp.headers["Service-Worker-Allowed"] = "/"
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
+
+
+@app.route("/api/vapid-public-key")
+def vapid_public_key():
+    return jsonify({"publicKey": get_settings().vapid_public_key})
+
+
+@app.route("/api/subscribe", methods=["POST"])
+def api_subscribe():
+    body = request.get_json(silent=True) or {}
+    slug = body.get("slug")
+    subscription = body.get("subscription")
+    data = get_data()
+    if not slug or slug not in data.people_by_slug:
+        return jsonify({"error": "pessoa inválida"}), 400
+    if not subscription or not subscription.get("endpoint"):
+        return jsonify({"error": "subscription inválida"}), 400
+    save_subscription(slug, subscription)
+    return jsonify({"ok": True, "devices": count_for(slug)})
+
+
+@app.route("/api/unsubscribe", methods=["POST"])
+def api_unsubscribe():
+    body = request.get_json(silent=True) or {}
+    endpoint = body.get("endpoint")
+    if not endpoint:
+        return jsonify({"error": "endpoint ausente"}), 400
+    delete_by_endpoint(endpoint)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/test-push", methods=["POST"])
+def api_test_push():
+    from push import notify_person
+
+    body = request.get_json(silent=True) or {}
+    slug = body.get("slug")
+    data = get_data()
+    person = data.people_by_slug.get(slug) if slug else None
+    if person is None:
+        return jsonify({"error": "pessoa inválida"}), 400
+    if count_for(slug) == 0:
+        return jsonify({"error": "sem dispositivos inscritos"}), 400
+    payload = {
+        "title": "Notificação de teste",
+        "body": f"Olá, {person.display_name.split()[0]}! As notificações estão funcionando. 🙌",
+        "url": url_for("person", slug=slug),
+        "tag": "teste",
+    }
+    sent = notify_person(slug, payload)
+    return jsonify({"ok": True, "sent": sent})
+
+
+@app.route("/tasks/send-reminders", methods=["GET", "POST"])
+def tasks_send_reminders():
+    from push import send_weekend_reminders
+
+    settings = get_settings()
+    token = request.args.get("token") or request.headers.get("X-Token")
+    if not settings.reminder_token or token != settings.reminder_token:
+        abort(403)
+    ref_arg = request.args.get("date")
+    ref = date.fromisoformat(ref_arg) if ref_arg else date.today()
+    report = send_weekend_reminders(ref)
+    return jsonify(report)
 
 
 @app.errorhandler(404)
