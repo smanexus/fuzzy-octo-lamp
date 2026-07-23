@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ person.display_name }} · Escala{% endblock %}
+
+{% block topbar_action %}
+<a class="back" href="{{ url_for('index') }}">‹ Voltar</a>
+{% endblock %}
+
+{% macro service_card(group) %}
+  {% set sd = group.service %}
+  {% set sch = schedules[sd.schedule_key] %}
+  <li>
+    <a class="service-card sch-{{ sd.schedule_key }}" href="{{ url_for('service', schedule_key=sd.schedule_key, iso_date=sd.date.isoformat()) }}">
+      <div class="sc-date">
+        <span class="sc-day">{{ sd.date.day }}</span>
+        <span class="sc-month">{{ sd.date|weekday_pt }} · {{ sd.date.strftime('%m/%y') }}</span>
+      </div>
+      <div class="sc-body">
+        <span class="sc-schedule">{{ sch.name }} · {{ sch.weekday }}</span>
+        <span class="sc-roles">
+          {% for role in group.roles %}
+            <span class="role-badge">{{ role }}</span>
+          {% endfor %}
+        </span>
+      </div>
+      <span class="chevron">›</span>
+    </a>
+  </li>
+{% endmacro %}
+
+{% block content %}
+<section class="person-head">
+  <span class="avatar avatar-lg">{{ person.display_name[0]|upper }}</span>
+  <h1>{{ person.display_name }}</h1>
+  <p class="subtitle">{{ upcoming|length }} escala{{ 's' if upcoming|length != 1 }} pela frente</p>
+</section>
+
+<h2 class="section-title">Próximas escalas</h2>
+{% if upcoming %}
+  <ul class="service-list">
+    {% for group in upcoming %}{{ service_card(group) }}{% endfor %}
+  </ul>
+{% else %}
+  <p class="empty">Nenhuma escala futura registrada.</p>
+{% endif %}
+
+{% if past %}
+  <details class="past">
+    <summary>Escalas anteriores ({{ past|length }})</summary>
+    <ul class="service-list">
+      {% for group in past %}{{ service_card(group) }}{% endfor %}
+    </ul>
+  </details>
+{% endif %}
+{% endblock %}
