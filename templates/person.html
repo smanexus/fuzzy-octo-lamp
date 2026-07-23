@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% block title %}{{ person.display_name }} · Escala{% endblock %}
 
-{% block topbar_action %}
-<a class="back" href="{{ url_for('index') }}">‹ Voltar</a>
+{% block topbar_back %}
+<a class="back" href="{{ url_for('index') }}" aria-label="Voltar">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
 {% endblock %}
 
-{% macro service_card(group) %}
+{% macro service_row(group) %}
   {% set sd = group.service %}
   {% set sch = schedules[sd.schedule_key] %}
   <li>
-    <a class="service-card sch-{{ sd.schedule_key }}" href="{{ url_for('service', schedule_key=sd.schedule_key, iso_date=sd.date.isoformat()) }}">
-      <div class="sc-date">
-        <span class="sc-day">{{ sd.date.day }}</span>
-        <span class="sc-month">{{ sd.date|weekday_pt }} · {{ sd.date.strftime('%m/%y') }}</span>
-      </div>
-      <div class="sc-body">
-        <span class="sc-schedule">{{ sch.name }} · {{ sch.weekday }}</span>
-        <span class="sc-roles">
-          {% for role in group.roles %}
-            <span class="role-badge">{{ role }}</span>
-          {% endfor %}
+    <a class="row row-service" href="{{ url_for('service', schedule_key=sd.schedule_key, iso_date=sd.date.isoformat()) }}">
+      <span class="date-block">
+        <span class="date-day">{{ sd.date.day }}</span>
+        <span class="date-meta">{{ sd.date|weekday_pt }} · {{ sd.date.strftime('%m/%y') }}</span>
+      </span>
+      <span class="row-main">
+        <span class="mtag mtag-{{ sd.schedule_key }}"><span class="mdot"></span>{{ sch.name }} · {{ sch.weekday }}</span>
+        <span class="roles">
+          {% for role in group.roles %}<span class="role">{{ role }}</span>{% endfor %}
         </span>
-      </div>
-      <span class="chevron">›</span>
+      </span>
+      <span class="chevron" aria-hidden="true">›</span>
     </a>
   </li>
 {% endmacro %}
@@ -30,25 +30,27 @@
 {% block content %}
 <section class="person-head">
   <span class="avatar avatar-lg">{{ person.display_name[0]|upper }}</span>
-  <h1>{{ person.display_name }}</h1>
-  <p class="subtitle">{{ upcoming|length }} escala{{ 's' if upcoming|length != 1 }} pela frente</p>
+  <div>
+    <h1 class="person-name">{{ person.display_name }}</h1>
+    <p class="person-sub">{{ upcoming|length }} escala{{ 's' if upcoming|length != 1 }} pela frente</p>
+  </div>
 </section>
 
-<section id="push-controls" class="push-card" data-slug="{{ person.slug }}" data-state="off">
-  <div class="push-info">
-    <span class="push-title">🔔 Lembrete no celular</span>
-    <span id="push-status" class="push-status">Ative para receber o aviso da sua escala no fim de semana.</span>
+<section id="push-controls" class="push" data-slug="{{ person.slug }}" data-state="off">
+  <div class="push-text">
+    <span class="push-title">Lembrete no celular</span>
+    <span id="push-status" class="push-status">Receba um aviso quando estiver escalado no fim de semana.</span>
   </div>
   <div class="push-actions">
-    <button id="push-toggle" type="button" class="btn-push">Ativar</button>
-    <button id="push-test" type="button" class="btn-push-ghost">Testar</button>
+    <button id="push-toggle" type="button" class="btn btn-primary btn-toggle"></button>
+    <button id="push-test" type="button" class="btn btn-ghost">Testar</button>
   </div>
 </section>
 
-<h2 class="section-title">Próximas escalas</h2>
+<p class="list-label">Próximas escalas</p>
 {% if upcoming %}
-  <ul class="service-list">
-    {% for group in upcoming %}{{ service_card(group) }}{% endfor %}
+  <ul class="grouped">
+    {% for group in upcoming %}{{ service_row(group) }}{% endfor %}
   </ul>
 {% else %}
   <p class="empty">Nenhuma escala futura registrada.</p>
@@ -56,9 +58,9 @@
 
 {% if past %}
   <details class="past">
-    <summary>Escalas anteriores ({{ past|length }})</summary>
-    <ul class="service-list">
-      {% for group in past %}{{ service_card(group) }}{% endfor %}
+    <summary>Escalas anteriores <span class="count">{{ past|length }}</span></summary>
+    <ul class="grouped">
+      {% for group in past %}{{ service_row(group) }}{% endfor %}
     </ul>
   </details>
 {% endif %}
