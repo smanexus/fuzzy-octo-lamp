@@ -1,25 +1,33 @@
 {% extends "base.html" %}
 {% block title %}{{ schedule.name }} · {{ service.date|br_date }}{% endblock %}
 
-{% block topbar_action %}
-<a class="back" href="javascript:history.back()">‹ Voltar</a>
+{% block topbar_back %}
+<a class="back" href="javascript:history.back()" aria-label="Voltar">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</a>
 {% endblock %}
 
 {% block content %}
 <section class="service-head sch-{{ service.schedule_key }}">
-  <span class="tag">{{ schedule.name }} · {{ schedule.weekday }}</span>
-  <h1>{{ service.date|long_date_pt }}</h1>
-  <p class="subtitle">{{ service.assignments|length }} pessoas escaladas</p>
+  <span class="service-emblem">
+    <img src="{{ url_for('static', filename='img/' + service.schedule_key + '.png') }}"
+         alt="{{ schedule.name }}" onerror="this.parentNode.classList.add('is-empty')">
+    <span class="service-emblem-dot"></span>
+  </span>
+  <div>
+    <span class="mtag mtag-{{ service.schedule_key }}"><span class="mdot"></span>{{ schedule.name }} · {{ schedule.weekday }}</span>
+    <h1 class="service-title">{{ service.date|long_date_pt }}</h1>
+    <p class="service-sub">{{ service.assignments|length }} pessoas escaladas</p>
+  </div>
 </section>
 
-<ul class="roster">
+<p class="list-label">Equipe</p>
+<ul class="grouped">
   {% for row in grouped %}
     <li class="roster-row">
       <span class="roster-role">{{ row.role }}</span>
       <span class="roster-people">
-        {% for a in row.people %}
-          <a class="roster-person" href="{{ url_for('person', slug=a.slug) }}">{{ a.display }}</a>{% if not loop.last %}<span class="sep">·</span>{% endif %}
-        {% endfor %}
+        {% for a in row.people %}<a class="roster-person" href="{{ url_for('person', slug=a.slug) }}">{{ a.display }}</a>{% if not loop.last %}<span class="sep">·</span>{% endif %}{% endfor %}
       </span>
     </li>
   {% endfor %}
