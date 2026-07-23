@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ schedule.name }} · {{ service.date|br_date }}{% endblock %}
+
+{% block topbar_action %}
+<a class="back" href="javascript:history.back()">‹ Voltar</a>
+{% endblock %}
+
+{% block content %}
+<section class="service-head sch-{{ service.schedule_key }}">
+  <span class="tag">{{ schedule.name }} · {{ schedule.weekday }}</span>
+  <h1>{{ service.date|long_date_pt }}</h1>
+  <p class="subtitle">{{ service.assignments|length }} pessoas escaladas</p>
+</section>
+
+<ul class="roster">
+  {% for row in grouped %}
+    <li class="roster-row">
+      <span class="roster-role">{{ row.role }}</span>
+      <span class="roster-people">
+        {% for a in row.people %}
+          <a class="roster-person" href="{{ url_for('person', slug=a.slug) }}">{{ a.display }}</a>{% if not loop.last %}<span class="sep">·</span>{% endif %}
+        {% endfor %}
+      </span>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

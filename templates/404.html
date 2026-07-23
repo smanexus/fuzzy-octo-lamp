@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Não encontrado{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Ops!</h1>
+  <p class="subtitle">Não encontramos essa página.</p>
+  <a class="btn" href="{{ url_for('index') }}">Voltar para a busca</a>
+</section>
+{% endblock %}
