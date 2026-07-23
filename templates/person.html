@@ -34,6 +34,17 @@
   <p class="subtitle">{{ upcoming|length }} escala{{ 's' if upcoming|length != 1 }} pela frente</p>
 </section>
 
+<section id="push-controls" class="push-card" data-slug="{{ person.slug }}" data-state="off">
+  <div class="push-info">
+    <span class="push-title">🔔 Lembrete no celular</span>
+    <span id="push-status" class="push-status">Ative para receber o aviso da sua escala no fim de semana.</span>
+  </div>
+  <div class="push-actions">
+    <button id="push-toggle" type="button" class="btn-push">Ativar</button>
+    <button id="push-test" type="button" class="btn-push-ghost">Testar</button>
+  </div>
+</section>
+
 <h2 class="section-title">Próximas escalas</h2>
 {% if upcoming %}
   <ul class="service-list">
@@ -51,4 +62,8 @@
     </ul>
   </details>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='app-push.js') }}"></script>
 {% endblock %}

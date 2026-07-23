@@ -1,14 +1,14 @@
 :root {
-  --bg: #0b1120;
-  --bg-elev: #131c31;
-  --bg-elev-2: #1b2740;
-  --line: #253251;
-  --text: #eef2fb;
-  --text-dim: #9aa7c4;
-  --accent: #6366f1;
-  --accent-2: #22d3ee;
-  --ichthus: #f59e0b;
-  --doulos: #f43f5e;
+  --bg: #1a1210;
+  --bg-elev: #251a15;
+  --bg-elev-2: #33241d;
+  --line: #43302a;
+  --text: #f6ede4;
+  --text-dim: #bfa694;
+  --accent: #a86232;
+  --accent-2: #d9a066;
+  --ichthus: #d98a3d;
+  --doulos: #b1502f;
   --radius: 16px;
   --radius-sm: 10px;
   --maxw: 620px;
@@ -22,7 +22,7 @@ html, body {
 }
 
 body {
-  background: radial-gradient(1200px 600px at 50% -10%, #1a2743 0%, var(--bg) 60%);
+  background: radial-gradient(1200px 600px at 50% -10%, #3a2418 0%, var(--bg) 60%);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -140,6 +140,20 @@ h1 {
   margin: 16px 4px 10px;
 }
 
+.home-logo {
+  margin-top: clamp(28px, 12vh, 90px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0.96;
+}
+.home-logo img {
+  max-width: min(78%, 320px);
+  height: auto;
+}
+
 /* ---------- People list ---------- */
 .people-list, .service-list, .roster {
   list-style: none;
@@ -200,6 +214,52 @@ h1 {
   margin: 22px 4px 12px;
 }
 
+/* ---------- Push / notifications ---------- */
+.push-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--bg-elev-2), var(--bg-elev));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+.push-info { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 3px; }
+.push-title { font-weight: 700; font-size: 15px; }
+.push-status { font-size: 13px; color: var(--text-dim); }
+.push-actions { display: flex; gap: 8px; }
+
+.btn-push, .btn-push-ghost {
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--line);
+}
+.btn-push {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #2a1408;
+  border: 0;
+}
+.btn-push-ghost {
+  background: transparent;
+  color: var(--text-dim);
+}
+.btn-push-ghost:disabled { opacity: .5; }
+
+/* button label + visibility react to the subscription state */
+.push-card[data-state="on"] .btn-push { background: transparent; border: 1px solid var(--accent-2); color: var(--accent-2); }
+.push-card[data-state="on"] .btn-push::before { content: "Desativar"; }
+.push-card:not([data-state="on"]) .btn-push::before { content: "Ativar"; }
+.push-card .btn-push { font-size: 0; }
+.push-card .btn-push::before { font-size: 14px; }
+.push-card:not([data-state="on"]) #push-test { display: none; }
+.push-card[data-state="unsupported"] .push-actions { display: none; }
+.push-card[data-state="working"] .btn-push { opacity: .6; pointer-events: none; }
+
 .service-card {
   display: flex;
   align-items: center;
@@ -245,8 +305,8 @@ h1 {
   padding: 4px 10px;
   border-radius: 999px;
 }
-.sch-ichthus .role-badge { border-color: rgba(245,158,11,.4); }
-.sch-doulos .role-badge { border-color: rgba(244,63,94,.4); }
+.sch-ichthus .role-badge { border-color: rgba(217,138,61,.45); }
+.sch-doulos .role-badge { border-color: rgba(177,80,47,.45); }
 
 .past { margin-top: 20px; }
 .past summary {
