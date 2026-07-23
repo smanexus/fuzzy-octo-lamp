@@ -82,16 +82,22 @@ Para testar com uma data específica (finge que "hoje" é essa segunda):
 python send_reminders.py 2026-08-03
 ```
 
+## Cores
+
+A paleta é tirada das próprias logos: fundo **vinho/bordô** (fundo do Ichthus),
+com acentos **laranja** e **dourado**; sábado (Ichthus) usa laranja e domingo
+(Doulos) usa vermelho. As variáveis ficam no topo de `static/style.css`.
+
 ## Logos
 
-Coloque as imagens em `static/`:
+Coloque as imagens em `static/img/`:
 
-- `static/img/alvorada.png` — logo da igreja (aparece na home e vira o ícone do PWA).
-- (opcional) logos de Ichthus e Doulos para os cards.
+- `static/img/alvorada.png` — logo da igreja. Aparece na home automaticamente
+  quando o arquivo existir; enquanto não existir, o espaço fica vazio (sem erro).
 
-Os ícones do PWA ficam em `static/icons/` (atualmente placeholders marrom;
-substitua por versões geradas a partir da logo da Alvorada nos tamanhos
-192, 512 e maskable-512).
+Os ícones do PWA ficam em `static/icons/` (atualmente placeholders na paleta
+vinho/laranja). Para usar a logo da Alvorada como ícone do app, gere as versões
+192, 512 e maskable-512 a partir dela e substitua os arquivos.
 
 ## Atualizar a escala
 

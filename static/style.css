@@ -1,14 +1,16 @@
 :root {
-  --bg: #1a1210;
-  --bg-elev: #251a15;
-  --bg-elev-2: #33241d;
-  --line: #43302a;
-  --text: #f6ede4;
-  --text-dim: #bfa694;
-  --accent: #a86232;
-  --accent-2: #d9a066;
-  --ichthus: #d98a3d;
-  --doulos: #b1502f;
+  /* palette drawn from the ministry logos: Ichthus deep wine, orange
+     square, Doulos red + gold */
+  --bg: #2a0b13;
+  --bg-elev: #3a121c;
+  --bg-elev-2: #4a1b26;
+  --line: #5a2430;
+  --text: #f9ece8;
+  --text-dim: #d1a7a4;
+  --accent: #e8791c;
+  --accent-2: #f2b21c;
+  --ichthus: #e8791c;
+  --doulos: #c0392b;
   --radius: 16px;
   --radius-sm: 10px;
   --maxw: 620px;
@@ -22,7 +24,7 @@ html, body {
 }
 
 body {
-  background: radial-gradient(1200px 600px at 50% -10%, #3a2418 0%, var(--bg) 60%);
+  background: radial-gradient(1200px 600px at 50% -10%, #591826 0%, var(--bg) 60%);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -241,7 +243,7 @@ h1 {
 }
 .btn-push {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #2a1408;
+  color: #2a0b13;
   border: 0;
 }
 .btn-push-ghost {
@@ -305,8 +307,8 @@ h1 {
   padding: 4px 10px;
   border-radius: 999px;
 }
-.sch-ichthus .role-badge { border-color: rgba(217,138,61,.45); }
-.sch-doulos .role-badge { border-color: rgba(177,80,47,.45); }
+.sch-ichthus .role-badge { border-color: rgba(232,121,28,.45); }
+.sch-doulos .role-badge { border-color: rgba(192,57,43,.5); }
 
 .past { margin-top: 20px; }
 .past summary {

@@ -36,7 +36,9 @@
   </ul>
 {% else %}
   <div class="home-logo">
-    <img src="{{ url_for('static', filename='img/alvorada.png') }}" alt="IPB do Jardim Alvorada">
+    <img src="{{ url_for('static', filename='img/alvorada.png') }}"
+         alt="IPB do Jardim Alvorada"
+         onerror="this.style.display='none'">
   </div>
 {% endif %}
 {% endblock %}
